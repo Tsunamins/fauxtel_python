@@ -1,21 +1,22 @@
 from sqlalchemy.orm import Session
-from app import models, schemas
+from app.schemas import LocationCreate
+from app.models import Location
 
-def get_location(db: Session, location_id: int):
-    return db.query(models.Location).filter(models.Location.id == location_id).first()
+def get_location(db: Session, location_id: str):
+    return db.query(Location).filter(Location.id == location_id).first()
 
 def get_locations(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(models.Location).offset(skip).limit(limit).all()
+    return db.query(Location).offset(skip).limit(limit).all()
 
-def create_location(db: Session, location: schemas.LocationCreate):
-    db_location = models.Location(**location.model_dump())
+def create_location(db: Session, location: LocationCreate):
+    db_location = Location(**location.model_dump())
     db.add(db_location)
     db.commit()
     db.refresh(db_location)
     return db_location
 
-def update_location(db: Session, location_id: int, location: schemas.LocationCreate):
-    db_location = db.query(models.Location).filter(models.Location.id == location_id).first()
+def update_location(db: Session, location_id: str, location: LocationCreate):
+    db_location = db.query(Location).filter(Location.id == location_id).first()
     if db_location:
         for key, value in location.model_dump().items():
             setattr(db_location, key, value)
@@ -23,8 +24,8 @@ def update_location(db: Session, location_id: int, location: schemas.LocationCre
         db.refresh(db_location)
     return db_location
 
-def delete_location(db: Session, location_id: int):
-    db_location = db.query(models.Location).filter(models.Location.id == location_id).first()
+def delete_location(db: Session, location_id: str):
+    db_location = db.query(Location).filter(Location.id == location_id).first()
     if db_location:
         db.delete(db_location)
         db.commit()
